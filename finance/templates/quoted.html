@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+<action="{{ url_for('quoted') }}" method="post">
+{% block title %}
+    Price of stock.
+{% endblock %}
+
+{% block main %}
+    <p>
+        {{name}}
+    </p>
+    <p>
+        {{price}}
+    </p>
+    <p>
+        {{symbol}}
+    </p>
+{% endblock %}
