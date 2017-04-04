@@ -41,7 +41,7 @@ def index():
     symb = db.execute ("select * from portfolio where id = :ii GROUP BY symbol ORDER BY symbol" , ii = ide)
     #if user has not bought any sahres
     if not symb:
-    #Return user a message in html and his cash holdings
+    #Return user a message in html and his cash holdings.
         return render_template ("noshares.html",cash = row[0]["cash"])
     else:
         total = 0
