@@ -34,12 +34,13 @@ db = SQL("sqlite:///finance.db")
 @app.route("/")
 @login_required
 def index():
-#Remember id
+    #Remember id
     ide = session["user_id"]
+    #Take all information from users data table, used for determining cash of user.
     row = db.execute ("select * from users where id = :ii" , ii = ide)
-    #take info about sahres user already bought
+    #take info about sahres user has bought
     symb = db.execute ("select * from portfolio where id = :ii GROUP BY symbol ORDER BY symbol" , ii = ide)
-    #if user has not bought any sahres
+    #if user has not bought any sahres then display noshare html file.
     if not symb:
     #Return user a message in html and his cash holdings.
         return render_template ("noshares.html",cash = row[0]["cash"])
@@ -53,7 +54,7 @@ def index():
             quote = lookup (symbol)
             #save each current price
             share["quoteprice"] = quote["price"]
-            #total should be equel to every shares current price multiply by number of shares
+            #This total formula works for only 1 share because my idex still don't sum the shares.
             total += (quote["price"] * share ['shares'])
         #grand is equel to total + the cash user has in his account
         grand = total + row[0]["cash"]    
