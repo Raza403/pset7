@@ -96,7 +96,8 @@ def buy():
             if prc <= csh[0]["cash"]:
                 db.execute("INSERT INTO portfolio (id, symbol,price,shares) VALUES (:ide, :symbol, :price, :shares)", ide = ide,symbol = symbl, price = prc, shares = number)
                 db.execute("UPDATE users SET cash = :cash WHERE id = :ide",cash = csh[0]["cash"] - prc, ide = ide)
-                return render_template("index.html")
+                #return render_template("index.html")
+                return redirect(url_for("index"))
             else:
                 return apology ("You don't have enough cash to buy these stocks")
     else:
