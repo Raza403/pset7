@@ -94,7 +94,7 @@ def buy():
             csh = db.execute("SELECT * FROM users WHERE id = :ide", ide = ide)
             #Only go forward if user have enough
             if prc <= csh[0]["cash"]:
-                db.execute("INSERT INTO portfolio (id, symbol,price,shares) VALUES (:ide, :symbol, :price, :shares)", ide = ide,symbol = symbl, price = prc, shares = number)
+                db.execute("INSERT INTO portfolio (id, symbol,price,shares,dtime) VALUES (:ide, :symbol, :price, :shares, DateTime('now'))", ide = ide,symbol = symbl, price = prc, shares = number)
                 db.execute("UPDATE users SET cash = :cash WHERE id = :ide",cash = csh[0]["cash"] - prc, ide = ide)
                 return redirect(url_for("index"))
             else:
@@ -253,7 +253,7 @@ def sell():
             #Add current price of the shares to user cash
             db.execute("UPDATE users SET cash = :cash WHERE id = :ide",cash = row[0]["cash"] + prc, ide = ide)
             #Make a negative sale in the portfolio
-            db.execute("INSERT INTO portfolio (id, symbol,price,shares) VALUES (:ide, :symbol, :price, :shares)", ide = ide,symbol = sym, price = prc, shares = -numb)
+            db.execute("INSERT INTO portfolio (id, symbol,price,shares,dtime) VALUES (:ide, :symbol, :price, :shares, DateTime('now'))", ide = ide,symbol = sym, price = prc, shares = -numb)
             return redirect(url_for("index"))
     else:
         return render_template("sell.html")
