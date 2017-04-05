@@ -221,33 +221,39 @@ def register():
 def sell():
     """Sell shares of stock."""
     if request.method == "POST":
-        #Remember id
+        #Get the symbol
         sym = request.form.get("symbol")
         if not sym:
             return apology ("Must enter the symbol")
+        #Get number of shares
         num = request.form.get("number")
         numb = int (num)
         if numb is None or numb == '' or numb < 1:
             return apology ("Please enter valid number of stocks to sell")
+        #Remember id
         ide = session["user_id"]
+        #Take all info about user for cash
         row = db.execute ("select * from users where id = :ii" , ii = ide)
-        #take info about sahres user has
-        sybl = db.execute ("select * from portfolio where id = :ii GROUP BY symbol ORDER BY symbol" , ii = ide)
+        #take info about sahres user has of that symbol
+        sybl = db.execute ("select * from portfolio where id = :ii AND symbol = :sym" , ii = ide,sym = sym)
         #if user has not bought any sahres
         if not sybl:
-        #Return user a message in html and his cash holdings
-            return render_template ("noshares.html",cash = row[0]["cash"])
+        #Go back to index page.
+            return redirect(url_for("index"))
         #Lookup and save dict in quoted    
         quoted = lookup(sym)
         #If symbol is invalid return apology
         if not quoted:
             return apology ("Invalid stock")
         else:
+            #Take price from dict quoted
             qtd = quoted["price"]
-            prc = float(qtd)
-            for share in range (numb):
-                db.execute("UPDATE users SET cash = :cash WHERE id = :ide",cash = row[0]["cash"] + prc, ide = ide)
-                db.execute("UPDATE portfolio SET shares = :shares WHERE id = :ide AND symbol = :smb",shares = sybl[0]["shares"] - 1,ide = ide,smb = sym)
+            #Multiply current price with number of shares to determine total value of shares sold
+            prc = float(qtd)*numb
+            #Add current price of the shares to user cash
+            db.execute("UPDATE users SET cash = :cash WHERE id = :ide",cash = row[0]["cash"] + prc, ide = ide)
+            #Make a negative sale in the portfolio
+            db.execute("INSERT INTO portfolio (id, symbol,price,shares) VALUES (:ide, :symbol, :price, :shares)", ide = ide,symbol = sym, price = prc, shares = -numb)
             return redirect(url_for("index"))
     else:
         return render_template("sell.html")
