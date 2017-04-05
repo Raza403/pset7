@@ -39,7 +39,7 @@ def index():
     #Take all information from users data table, used for determining cash of user.
     row = db.execute ("select * from users where id = :ii" , ii = ide)
     #take info about sahres user has bought
-    symb = db.execute ("select * from portfolio where id = :ii GROUP BY symbol ORDER BY symbol" , ii = ide)
+    symb = db.execute("SELECT symbol, price, SUM(shares) as total_shares FROM portfolio WHERE id = :ii GROUP BY symbol ORDER BY symbol",ii=ide)
     #if user has not bought any sahres then display noshare html file.
     if not symb:
     #Return user a message in html and his cash holdings.
@@ -54,8 +54,8 @@ def index():
             quote = lookup (symbol)
             #save each current price
             share["quoteprice"] = quote["price"]
-            #This total formula works for only 1 share because my idex still don't sum the shares.
-            total += (quote["price"] * share ['shares'])
+            #Total equels fresh quote price of  each stock * sum of shares of each stock
+            total += quote["price"] * share ["total_shares"]
         #grand is equel to total + the cash user has in his account
         grand = total + row[0]["cash"]    
         #render values    
@@ -96,7 +96,6 @@ def buy():
             if prc <= csh[0]["cash"]:
                 db.execute("INSERT INTO portfolio (id, symbol,price,shares) VALUES (:ide, :symbol, :price, :shares)", ide = ide,symbol = symbl, price = prc, shares = number)
                 db.execute("UPDATE users SET cash = :cash WHERE id = :ide",cash = csh[0]["cash"] - prc, ide = ide)
-                #return render_template("index.html")
                 return redirect(url_for("index"))
             else:
                 return apology ("You don't have enough cash to buy these stocks")

@@ -36,9 +36,9 @@ Your Portfolio
     {% for stock in symbol %}
         <tr>
             <td>{{ stock["symbol"] }}</td>
-            <td>{{ stock["shares"] }}</td>
+            <td>{{ stock["total_shares"] }}</td>
             <td>{{ stock["quoteprice"] }}</td>
-            <td>{{stock["shares"] * stock ["quoteprice"]}} </td>
+            <td>{{stock["total_shares"] * stock ["quoteprice"]}} </td>
              {% if loop.first %}
             <td rowspan = "{{loop.length}}">{{cash}}</td>
             <td rowspan = "{{loop.length}}">{{gtotal}}</td>
